@@ -1,6 +1,8 @@
 """
 保存有知乎登录cookie的ClientSession
 """
+from http.cookies import SimpleCookie
+
 import aiohttp
 import asyncio
 import base64
@@ -34,11 +36,22 @@ class ZhihuClient(aiohttp.ClientSession):
                           '(KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
             'Connection': 'Keep-Alive',
             'Referer': 'https://www.zhihu.com/',
-            'accept-encoding': 'gzip, deflate',
+            'accept-encoding': 'gzip',
+            'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
         }
         self._default_headers = headers
         self.logger = get_logger()
         self.cookie_file = COOKIE_FILE or '/tmp/cookies.pick'
+        self.cookie = SimpleCookie()
+        self.cookie['BEC'] = '6ff32b60f55255af78892ba1e551063a'
+        self.cookie['JOID'] = 'UFoWAEsKPpkKxERRSAvsB-3EGpNROX2sTZ4uGzB-WN9ahAooGOXVYm3GRVBLiDlIGAwXsOZpXQBOEf_jjdmPyvs='
+        self.cookie['SESSIONID'] = '3B5DXjKxvfGPCLyQ6c11gPnWp8nsbNrcp9MbqXDiWX5'
+        self.cookie['osd'] = 'VVkVAUoPPZoLxUFSSwrtAu7HG5JUOn6tTJstGDF_XdxZhQstG-bUY2jFRlFKjTpLGQ0Ss-VoXAVNEv7iiNqMy_o='
+        self.cookie['q_c1'] = 'e1731e0b499144a4bc1c4423c23add23|1724987057000|1724987057000'
+        self.cookie['__snaker__id'] = 'Eq59DbXp3mTKxizh'
+        self.cookie['z_c0'] = '2|1:0|10:1727582604|4:z_c0|80:MS4xQzJ2SUFnQUFBQUFtQUFBQVlBSlZUWXNmNW1lQzFrWHJxNDZGOTVQVlBpZ2R3bFB2LXdtZWtRPT0=|991891e7558d070e9c6c0aa192eea24257166de13606158693f2b0fe9a85e9f7'
+
+        self.cookie_jar.update_cookies(self.cookie)
 
     def get(self, url,  **kwargs):
         """Perform HTTP GET request."""
@@ -59,8 +72,6 @@ class ZhihuClient(aiohttp.ClientSession):
         :return:
         """
         if load_cookies:
-            self.cookie_jar.load(self.cookie_file)
-            self.logger.debug(f'加载cookies从:{self.cookie_file}')
             is_succ = await self.check_login()
             if is_succ:
                 print_colour('登录成功!', colour='green')
@@ -91,11 +102,11 @@ class ZhihuClient(aiohttp.ClientSession):
         headers = {
             'accept-encoding': 'gzip, deflate, br',
             'Host': 'www.zhihu.com',
-            'Referer': 'https://www.zhihu.com/',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                          '(KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
+            'Referer': 'https://www.zhihu.com/signin?next=%2F',
+            'Origin': 'https://www.zhihu.com',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
             'content-type': 'application/x-www-form-urlencoded',
-            'x-zse-83': '3_2.0',
+            'x-zse-83': '3_3.0',
             'x-xsrftoken': xsrf
         }
         data = self._encrypt(login_data)

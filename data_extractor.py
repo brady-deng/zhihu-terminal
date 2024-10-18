@@ -40,54 +40,55 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
             author = target['author']
             question = target.get('question')
             playlist = target.get('thumbnail_extra_info', {}).get('playlist')
-            article_info = {
-                'author': {  # 作者信息
-                    'name': author['name'],
-                    'headline': author.get('headline'),
-                    'head': author['avatar_url'],
-                    'gender': author.get('gender'),
-                    'url': author.get('url'),
-                },
-                'excerpt': target.get('excerpt_new') or target.get('excerpt'),
-                'content': target['content'],
-                'voteup_count': target.get('voteup_count', target.get('vote_count')),  # 赞同数
-                'visited_count': target.get('visited_count'),
-                'thanks_count': target.get('thanks_count', 0),
-                'comment_count': target['comment_count'],
-                'id': str(target['id']),
-                'type': target['type'],
-                'created_time': d['created_time'],
-                'updated_time': d['updated_time'],
-            }
-            # # 如果type是zvideo，那么voteup_count对应的属性名是vote_count,这里把属性名修改过来
-            if target['type'] == 'zvideo' and playlist:
-                article_info['content'] += f'\n{playlist.get("hd", {}).get("url", "")}'
-                article_info['excerpt'] = '**video**'
-            #     article_info['voteup_count'] = target.get('vote_count')
-            if question:
-                question = {
-                    'author': {
-                        'name': question['author']['name'],
-                        'headline': question['author'].get('headline'),
-                        'head': question['author'].get('head'),
-                        'gender': question['author'].get('gender'),
-                        'url': question['author'].get('url'),
+            if 'content' in target:
+                article_info = {
+                    'author': {  # 作者信息
+                        'name': author['name'],
+                        'headline': author.get('headline'),
+                        'head': author['avatar_url'],
+                        'gender': author.get('gender'),
+                        'url': author.get('url'),
                     },
-                    'title': question['title'],
-                    'url': question['url'],
-                    'id': str(question['id']),
-                    'type': 'normal',
+                    'excerpt': target.get('excerpt_new') or target.get('excerpt'),
+                    'content': target['content'],
+                    'voteup_count': target.get('voteup_count', target.get('vote_count')),  # 赞同数
+                    'visited_count': target.get('visited_count'),
+                    'thanks_count': target.get('thanks_count', 0),
+                    'comment_count': target['comment_count'],
+                    'id': str(target['id']),
+                    'type': target['type'],
+                    'created_time': d['created_time'],
+                    'updated_time': d['updated_time'],
                 }
-            else:
-                question = {
-                    'title': target['title'],
-                    'url': target.get('url'),
-                    'type': 'market',
-                    'id': '',
-                    'author': target['author']
-                }
-            article_info['question'] = question
-            output.append(article_info)
+                # # 如果type是zvideo，那么voteup_count对应的属性名是vote_count,这里把属性名修改过来
+                if target['type'] == 'zvideo' and playlist:
+                    article_info['content'] += f'\n{playlist.get("hd", {}).get("url", "")}'
+                    article_info['excerpt'] = '**video**'
+                #     article_info['voteup_count'] = target.get('vote_count')
+                if question:
+                    question = {
+                        'author': {
+                            'name': question['author']['name'],
+                            'headline': question['author'].get('headline'),
+                            'head': question['author'].get('head'),
+                            'gender': question['author'].get('gender'),
+                            'url': question['author'].get('url'),
+                        },
+                        'title': question['title'],
+                        'url': question['url'],
+                        'id': str(question['id']),
+                        'type': 'normal',
+                    }
+                else:
+                    question = {
+                        'title': target['title'],
+                        'url': target.get('url'),
+                        'type': 'market',
+                        'id': '',
+                        'author': target['author']
+                    }
+                article_info['question'] = question
+                output.append(article_info)
         self.logger.debug(output)
         return output
 
@@ -212,7 +213,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         """
         output = []
         for d in result['data']:  # 提取用到的数据
-            target = d
+            target = d['target']
             author = target['author']
             question = target.get('question')
             article_info = {
@@ -224,15 +225,13 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                     'url': author.get('url'),
                 },
                 'excerpt': target.get('excerpt_new') or target.get('excerpt'),
-                'content': target['content'],
+                'content': target.get('content') or target.get('excerpt'),
                 'voteup_count': target['voteup_count'],  # 赞同数
                 'visited_count': target.get('visited_count', 0),
                 'thanks_count': target.get('thanks_count', 0),
                 'comment_count': target['comment_count'],
                 'id': str(target['id']),
-                'type': target['type'],
-                'created_time': d['created_time'],
-                'updated_time': d['updated_time'],
+                'type': target['type']
             }
             if question:
                 question = {
@@ -263,6 +262,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         result = await super().get_article_by_question(question_id, offset, limit)
         output = self.extract_article_by_question(result)
         paging = result['paging']
+        paging['previous'] = result['url']
         self.logger.debug(output)
         return output, paging
 
@@ -275,5 +275,6 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         result = await super().get_article_by_question_url(url)
         output = self.extract_article_by_question(result)
         paging = result['paging']
+        paging['previous'] = result['url']
         self.logger.debug(output)
         return output, paging
