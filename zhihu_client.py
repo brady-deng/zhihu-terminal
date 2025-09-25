@@ -43,13 +43,13 @@ class ZhihuClient(aiohttp.ClientSession):
         self.logger = get_logger()
         self.cookie_file = COOKIE_FILE or '/tmp/cookies.pick'
         self.cookie = SimpleCookie()
-        self.cookie['BEC'] = '6ff32b60f55255af78892ba1e551063a'
-        self.cookie['JOID'] = 'UFoWAEsKPpkKxERRSAvsB-3EGpNROX2sTZ4uGzB-WN9ahAooGOXVYm3GRVBLiDlIGAwXsOZpXQBOEf_jjdmPyvs='
-        self.cookie['SESSIONID'] = '3B5DXjKxvfGPCLyQ6c11gPnWp8nsbNrcp9MbqXDiWX5'
-        self.cookie['osd'] = 'VVkVAUoPPZoLxUFSSwrtAu7HG5JUOn6tTJstGDF_XdxZhQstG-bUY2jFRlFKjTpLGQ0Ss-VoXAVNEv7iiNqMy_o='
-        self.cookie['q_c1'] = 'e1731e0b499144a4bc1c4423c23add23|1724987057000|1724987057000'
-        self.cookie['__snaker__id'] = 'Eq59DbXp3mTKxizh'
-        self.cookie['z_c0'] = '2|1:0|10:1727582604|4:z_c0|80:MS4xQzJ2SUFnQUFBQUFtQUFBQVlBSlZUWXNmNW1lQzFrWHJxNDZGOTVQVlBpZ2R3bFB2LXdtZWtRPT0=|991891e7558d070e9c6c0aa192eea24257166de13606158693f2b0fe9a85e9f7'
+        self.cookie['BEC'] = '244e292b1eefcef20c9b81b1d9777823'
+        self.cookie['JOID'] = 'W14cBk0zwG19o5YpNYBTftZr4ogvbbswO'
+        self.cookie['SESSIONID'] = 'QtQEFwGfczDh7u47f9eYp8EhRR9NaGzN9CFa1C1uQLB'
+        self.cookie['osd'] = 'U1kRBk47x2B9oJ4uOIBQdtFm4osnarYwOOLpbF9cvSEUl'
+        self.cookie['q_c1'] = '30524480ea8a4a5ea15ba01a1b50c38b'
+        self.cookie['__snaker__id'] = 'U2wTmcDCugbGZojS'
+        self.cookie['z_c0'] = '2|1:0|10:1757124105|4:z_c0|80:MS4xQzJ2SUFnQUFBQUFtQUFBQVlBSlZUWTNha21ueDBmdmtTMGNmWXF3UDJCU3lTLTl3bm9iRV9nPT0=|91fd880a3206a4927bd0b02dfbbcf7451fdc0bbdb3140304292d5f968e2ae4d3'
 
         self.cookie_jar.update_cookies(self.cookie)
 
